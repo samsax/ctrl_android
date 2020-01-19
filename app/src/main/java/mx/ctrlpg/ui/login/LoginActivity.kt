@@ -1,5 +1,6 @@
 package mx.ctrlpg.ui.login
 
+import ResponseLogin
 import android.app.Activity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -14,10 +15,15 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
-
 import mx.ctrlpg.R
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import android.annotation.SuppressLint
+import com.google.android.material.snackbar.Snackbar
+import mx.ctrlpg.ApiUtils.apiService
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
 
 class LoginActivity : AppCompatActivity() {
 
@@ -84,7 +90,7 @@ class LoginActivity : AppCompatActivity() {
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE ->
-                        loginViewModel.login(
+                        LoginUser(
                             username.text.toString(),
                             password.text.toString()
                         )
@@ -94,9 +100,48 @@ class LoginActivity : AppCompatActivity() {
 
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
-                loginViewModel.login(username.text.toString(), password.text.toString())
+                LoginUser(
+                    username.text.toString(),
+                    password.text.toString()
+                )
+
             }
         }
+    }
+
+    private fun LoginUser(userName: String, pass: String){
+
+        val call = apiService.login(userName,"01cfcd4f6b8770febfb40cb906715822")
+
+        call.enqueue(object : Callback<ResponseLogin> {
+            @SuppressLint("CommitPrefEdits")
+            override fun onResponse(call: Call<ResponseLogin>, response: Response<ResponseLogin>) {
+                val loginResponse = response.body()
+
+                if (!loginResponse?.error!!) {
+                    Toast.makeText(this@LoginActivity,loginResponse.info.message,Toast.LENGTH_LONG).show()
+                    loginResponse.info.message
+//                    SharedPrefManager.getInstance(this@LoginActivity)
+//                        .saveUser(loginResponse.getUser())
+//
+//                    val intent = Intent(this@LoginActivity, ProfileActivity::class.java)
+//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//                    startActivity(intent)
+
+
+                } else {
+                    Toast.makeText(
+                        this@LoginActivity,
+                        loginResponse.info.message,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseLogin>, t: Throwable) {
+
+            }
+        })
     }
 
     private fun updateUiWithUser(model: LoggedInUserView) {
