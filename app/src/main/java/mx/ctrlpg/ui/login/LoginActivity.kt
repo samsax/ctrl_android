@@ -17,12 +17,16 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import mx.ctrlpg.R
 import android.annotation.SuppressLint
+import android.content.Intent
 import com.google.android.material.snackbar.Snackbar
 import mx.ctrlpg.ApiUtils.apiService
+import mx.ctrlpg.MainActivity
+import mx.ctrlpg.Util.UtilOwner
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.security.MessageDigest
 
 
 class LoginActivity : AppCompatActivity() {
@@ -111,7 +115,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun LoginUser(userName: String, pass: String){
 
-        val call = apiService.login(userName,"01cfcd4f6b8770febfb40cb906715822")
+        val call = apiService.login(userName,UtilOwner().toMD5(pass))
 
         call.enqueue(object : Callback<ResponseLogin> {
             @SuppressLint("CommitPrefEdits")
@@ -124,9 +128,9 @@ class LoginActivity : AppCompatActivity() {
 //                    SharedPrefManager.getInstance(this@LoginActivity)
 //                        .saveUser(loginResponse.getUser())
 //
-//                    val intent = Intent(this@LoginActivity, ProfileActivity::class.java)
-//                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-//                    startActivity(intent)
+                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
 
 
                 } else {
@@ -159,6 +163,7 @@ class LoginActivity : AppCompatActivity() {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
 }
+
 
 /**
  * Extension function to simplify setting an afterTextChanged action to EditText components.
