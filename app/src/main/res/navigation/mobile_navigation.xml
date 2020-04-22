@@ -9,7 +9,16 @@
         android:id="@+id/nav_home"
         android:name="mx.ctrlpg.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_dayFragment"
+            app:destination="@id/day_fragment">
+            <argument
+                android:name="cacId"
+                app:argType="integer"
+                android:defaultValue="0" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/nav_gallery"
@@ -40,4 +49,9 @@
         android:name="mx.ctrlpg.ui.send.SendFragment"
         android:label="@string/menu_send"
         tools:layout="@layout/fragment_send" />
+    <fragment
+        android:id="@+id/day_fragment"
+        android:name="mx.ctrlpg.ui.event.EventFragment"
+        android:label="DayFragment" />
+
 </navigation>

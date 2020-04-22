@@ -1,6 +1,5 @@
 package mx.ctrlpg.data
 
-import ResponseLogin
 import mx.ctrlpg.data.model.LoggedInUser
 
 /**
