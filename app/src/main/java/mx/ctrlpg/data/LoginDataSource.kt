@@ -1,32 +1,5 @@
 package mx.ctrlpg.data
 
-import ResponseLogin
-import android.annotation.SuppressLint
-import android.content.Intent
-import android.util.Log
-import android.view.View
-import androidx.core.content.ContextCompat.startActivity
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import mx.ctrlpg.APIService
-import mx.ctrlpg.ApiUtils
-import mx.ctrlpg.ApiUtils.apiService
-import mx.ctrlpg.data.model.LoggedInUser
-import mx.ctrlpg.data.model.LoginUser
-import mx.ctrlpg.ui.login.LoggedInUserView
-import mx.ctrlpg.ui.login.LoginResult
-import okhttp3.MediaType
-import okhttp3.Request
-import okhttp3.RequestBody
-import org.jetbrains.anko.doAsync
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.io.IOException
-
 /**
  * Class that handles authentication w/ login credentials and retrieves user information.
  */

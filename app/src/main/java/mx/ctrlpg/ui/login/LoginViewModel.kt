@@ -1,14 +1,11 @@
 package mx.ctrlpg.ui.login
 
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import android.util.Patterns
-import mx.ctrlpg.APIService
-import mx.ctrlpg.data.LoginRepository
-import mx.ctrlpg.data.Result
-
 import mx.ctrlpg.R
+import mx.ctrlpg.data.LoginRepository
 
 class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
 

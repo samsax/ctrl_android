@@ -1,8 +1,8 @@
-package mx.ctrlpg.Util
+package mx.ctrlpg.util
 
 import java.security.MessageDigest
 
-class UtilOwner(){
+class UtilOwner{
 
     fun toMD5(value: String): String {
         val bytes = MessageDigest.getInstance("MD5").digest(value.toByteArray())

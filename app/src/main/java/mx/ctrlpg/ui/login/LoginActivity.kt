@@ -1,32 +1,32 @@
 package mx.ctrlpg.ui.login
 
 import ResponseLogin
+import android.annotation.SuppressLint
 import android.app.Activity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import android.content.Intent
 import android.os.Bundle
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.Button
 import android.widget.EditText
-import android.widget.ProgressBar
 import android.widget.Toast
-import mx.ctrlpg.R
-import android.annotation.SuppressLint
-import android.content.Intent
-import com.google.android.material.snackbar.Snackbar
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import kotlinx.android.synthetic.main.activity_login.*
 import mx.ctrlpg.ApiUtils.apiService
 import mx.ctrlpg.MainActivity
-import mx.ctrlpg.Util.UtilOwner
-import org.json.JSONObject
+import mx.ctrlpg.R
+import mx.ctrlpg.util.PreferenceHelper
+import mx.ctrlpg.util.UtilOwner
+import mx.ctrlpg.util.VariableConstants.AUTHORIZATION
+import mx.ctrlpg.util.VariableConstants.USUARIONOMBRECOMPLETO
+import mx.ctrlpg.util.VariableConstants.USUARIOSESION
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.security.MessageDigest
 
 
 class LoginActivity : AppCompatActivity() {
@@ -36,12 +36,12 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if(PreferenceHelper.read(AUTHORIZATION,"")!=""){
+            val intent = Intent(this@LoginActivity, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
         setContentView(R.layout.activity_login)
-
-        val username = findViewById<EditText>(R.id.username)
-        val password = findViewById<EditText>(R.id.password)
-        val login = findViewById<Button>(R.id.login)
-        val loading = findViewById<ProgressBar>(R.id.loading)
 
         loginViewModel = ViewModelProviders.of(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
@@ -94,7 +94,7 @@ class LoginActivity : AppCompatActivity() {
             setOnEditorActionListener { _, actionId, _ ->
                 when (actionId) {
                     EditorInfo.IME_ACTION_DONE ->
-                        LoginUser(
+                        loginUser(
                             username.text.toString(),
                             password.text.toString()
                         )
@@ -104,7 +104,7 @@ class LoginActivity : AppCompatActivity() {
 
             login.setOnClickListener {
                 loading.visibility = View.VISIBLE
-                LoginUser(
+                loginUser(
                     username.text.toString(),
                     password.text.toString()
                 )
@@ -113,9 +113,11 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun LoginUser(userName: String, pass: String){
+    private fun loginUser(userName: String, pass: String){
 
-        val call = apiService.login(userName,UtilOwner().toMD5(pass))
+        val call = apiService.login(userName,
+            UtilOwner().toMD5(pass)
+        )
 
         call.enqueue(object : Callback<ResponseLogin> {
             @SuppressLint("CommitPrefEdits")
@@ -127,7 +129,9 @@ class LoginActivity : AppCompatActivity() {
                     loginResponse.info.message
 //                    SharedPrefManager.getInstance(this@LoginActivity)
 //                        .saveUser(loginResponse.getUser())
-//
+                    PreferenceHelper.write(AUTHORIZATION,loginResponse.info.objectClass.autorization)
+                    PreferenceHelper.write(USUARIONOMBRECOMPLETO,loginResponse.info.objectClass.usuarioNombreCompleto)
+                    PreferenceHelper.write(USUARIOSESION,loginResponse.info.objectClass.usuarioSesion)
                     val intent = Intent(this@LoginActivity, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     startActivity(intent)
@@ -143,7 +147,11 @@ class LoginActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<ResponseLogin>, t: Throwable) {
-
+                Toast.makeText(
+                    this@LoginActivity,
+                    t.message,
+                    Toast.LENGTH_LONG
+                ).show()
             }
         })
     }
