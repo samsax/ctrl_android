@@ -20,7 +20,7 @@ class EventAgendaAdapter (var context: Context) : DefaultEventAdapter() {
 
         init {
             format = SimpleDateFormat(context.getString(com.ognev.kotlin.agendacalendarview.R.string.header_date),
-                Locale.ENGLISH)
+                Locale("es","ES"))
         }
 
         override fun getHeaderLayout(): Int {
@@ -53,10 +53,12 @@ class EventAgendaAdapter (var context: Context) : DefaultEventAdapter() {
             }
 
             view.setOnClickListener {
-                val bundle = bundleOf("cacId" to myObject!!.id)
-                it.findNavController().navigate(R.id.action_nav_home_to_dayFragment,bundle)
+                if(myObject!!.evento!=null) {
+                    val bundle = bundleOf("evento" to myObject!!.evento)
+                    it.findNavController().navigate(R.id.action_nav_home_to_event_fragment, bundle)
+                }
             }
-        }
+            }
 
         override fun getEventLayout(hasEvent: Boolean): Int {
             return if(hasEvent) R.layout.view_agenda_event else R.layout.view_agenda_empty_event

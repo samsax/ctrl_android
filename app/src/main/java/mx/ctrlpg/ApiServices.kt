@@ -1,6 +1,7 @@
 package mx.ctrlpg
 
 import ResponseLogin
+import ResponseSucursalCordones
 import mx.ctrlpg.data.model.CalendarioRespuesta
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -23,11 +24,18 @@ interface APIService {
                       @Query("autorizacion") autorizacion: String?,
                       @Query("fechIni") fechIni: String? = "2020/04/01",
                       @Query("fechFin") fechFin: String?= "2020/04/30"): Call<CalendarioRespuesta>
+
+    @GET("mobile/sucursal/all")
+    fun getSucursalCordones(
+        @Query("usuario") usuario: String?,
+        @Query("autorizacion") autorizacion: String?,
+        @Query("sucCliId") sucCliId: Long? = 26)
+            : Call<ResponseSucursalCordones>
 }
 
 object ApiUtils {
 
-    val BASE_URL = "http://maximoag.com:8080/serviciosCtrlPg/servicio/"
+    private const val BASE_URL = "http://maximoag.com:8080/serviciosCtrlPg/servicio/"
 
     val apiService: APIService
         get() = BaseRetrofit.getClient(BASE_URL)!!.create(APIService::class.java)

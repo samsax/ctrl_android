@@ -1,7 +1,6 @@
 package mx.ctrlpg.util.calendar
 
 import android.content.Context
-import android.icu.text.DateFormat.DAY
 import com.ognev.kotlin.agendacalendarview.CalendarManager
 import com.ognev.kotlin.agendacalendarview.models.CalendarEvent
 import com.ognev.kotlin.agendacalendarview.models.DayItem
@@ -16,10 +15,11 @@ fun listToEvent(
     context: Context?,
     eventList: MutableList<CalendarEvent>
 ): MutableList<CalendarEvent> {
-    val calNow = Calendar.getInstance(Locale.ENGLISH)
-    val calStart = Calendar.getInstance(Locale.ENGLISH)
-    val calEnd = Calendar.getInstance(Locale.ENGLISH)
-    val calDay = Calendar.getInstance(Locale.ENGLISH)
+    val locale = Locale("es","ES")
+    val calNow = Calendar.getInstance(locale)
+    val calStart = Calendar.getInstance(locale)
+    val calEnd = Calendar.getInstance(locale)
+    val calDay = Calendar.getInstance(locale)
     val sdf = SimpleDateFormat("yyyy/MM/dd")
     val sdfDay = SimpleDateFormat("yyyy/MM/dd")
     var dayItem: DayItem? = null
@@ -40,7 +40,9 @@ fun listToEvent(
                 day.timeInMillis = System.currentTimeMillis()
                 day.set(Calendar.DAY_OF_MONTH, calDay.get(Calendar.DAY_OF_MONTH))
                 val baseEvent =
-                    SampleEvent(id=event.cacId.toLong(),name = event.cacTitle, description = event.cacCliDescripcion)
+                    SampleEvent(
+                        id =event.cacId.toLong(),
+                        name = event.cacTitle, description = event.cacCliDescripcion, evento = event)
                 val baseCalendarEvent = MyCalendarEvent(day, day, dayItem, baseEvent)
                 baseCalendarEvent.setEventInstanceDay(calDay)
                 eventList.add(baseCalendarEvent)

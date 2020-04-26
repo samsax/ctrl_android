@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -18,6 +20,8 @@ import com.google.android.material.snackbar.Snackbar
 import mx.ctrlpg.ui.login.LoginActivity
 import mx.ctrlpg.util.PreferenceHelper
 import mx.ctrlpg.util.VariableConstants
+import mx.ctrlpg.util.VariableConstants.USUARIONOMBRECOMPLETO
+import mx.ctrlpg.util.VariableConstants.USUARIOSESION
 
 class MainActivity : AppCompatActivity() {
 
@@ -36,6 +40,8 @@ class MainActivity : AppCompatActivity() {
         }
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
+        val headerView = navView.getHeaderView(0)
+        setupMenuHeader(headerView)
         val navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
@@ -57,7 +63,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item != null) {
-            if(item.itemId == R.id.action_settings){
+            if(item.itemId == R.id.action_close_session){
                 PreferenceHelper.write(VariableConstants.AUTHORIZATION,"")
                 PreferenceHelper.write(VariableConstants.USUARIONOMBRECOMPLETO,"")
                 PreferenceHelper.write(VariableConstants.USUARIOSESION,"")
@@ -66,11 +72,20 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
-        return true
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+
+
+    private fun setupMenuHeader(headerView: View) {
+        val tvHeaderName = headerView.findViewById(R.id.nav_header_title) as TextView
+        val tvHeaderEmail = headerView.findViewById(R.id.nav_header_subtitle) as TextView
+        tvHeaderName.text = PreferenceHelper.read(USUARIONOMBRECOMPLETO,"")
+        tvHeaderEmail.text = PreferenceHelper.read(USUARIOSESION,"")
+    }
+
 }

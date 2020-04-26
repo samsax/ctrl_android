@@ -78,7 +78,7 @@ class HomeFragment : Fragment(), CalendarController{
             )
         }
 
-        contentManager!!.locale = Locale.ENGLISH
+        contentManager!!.locale = Locale("es", "ES")
         contentManager!!.setDateRange(minDate, maxDate)
 
         getCalendario()
@@ -124,7 +124,7 @@ class HomeFragment : Fragment(), CalendarController{
         eventList = arrayListOf()
         val maxLength = Calendar.getInstance().getMaximum(Calendar.DAY_OF_MONTH)
         for (i in 1..maxLength) {
-            val day = Calendar.getInstance(Locale.ENGLISH)
+            val day = Calendar.getInstance(Locale("es","ES"))
             day.timeInMillis = System.currentTimeMillis()
             day.set(Calendar.DAY_OF_MONTH, i)
 
@@ -207,7 +207,7 @@ class HomeFragment : Fragment(), CalendarController{
 
 
                 for (i in 1..startMonthCal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-                    val day = Calendar.getInstance(Locale.ENGLISH)
+                    val day = Calendar.getInstance(Locale("es","ES"))
                     day.timeInMillis = System.currentTimeMillis()
                     day.set(Calendar.MONTH, startMonth)
                     day.set(Calendar.DAY_OF_MONTH, i)
