@@ -24,31 +24,26 @@ fun listToEvent(
     val sdfDay = SimpleDateFormat("yyyy/MM/dd")
     var dayItem: DayItem? = null
     for (event in lista){
-        if(event.cacHoraIncio!="")
+        if(event.cacHoraIncio!="") {
             calStart.time = sdf.parse(event.cacHoraIncio)
-        if(event.cacHoraFin!="")
-            calEnd.time = sdf.parse(event.cacHoraFin)
-        if(event.cacFecha!="") {
             calDay.time = sdfDay.parse(event.cacFecha)
             dayItem = getDayItem(calDay,context)
-        }else{
-            dayItem = null
         }
-        if(calDay.get(Calendar.MONTH) == calNow.get(Calendar.MONTH)) {
-            if ((event.cacTitle != "") && (event.cacCliDescripcion != "") && (dayItem != null)) {
-                val day = Calendar.getInstance(Locale.ENGLISH)
-                day.timeInMillis = System.currentTimeMillis()
-                day.set(Calendar.DAY_OF_MONTH, calDay.get(Calendar.DAY_OF_MONTH))
-                val baseEvent =
-                    SampleEvent(
-                        id =event.cacId.toLong(),
-                        name = event.cacTitle, description = event.cacCliDescripcion, evento = event)
-                val baseCalendarEvent = MyCalendarEvent(day, day, dayItem, baseEvent)
-                baseCalendarEvent.setEventInstanceDay(calDay)
-                eventList.add(baseCalendarEvent)
+        if(event.cacHoraFin!="")
+            calEnd.time = sdf.parse(event.cacHoraFin)
+        if ((event.cacTitle != "") && (event.cacCliDescripcion != "") && (dayItem != null)) {
+            calStart.set(Calendar.DAY_OF_MONTH, calStart.get(Calendar.DAY_OF_MONTH))
+            val day = calStart.clone() as Calendar
+            day.set(Calendar.DAY_OF_MONTH, calStart.get(Calendar.DAY_OF_MONTH))
+            val baseEvent =
+                SampleEvent(
+                    id =event.cacId.toLong(),
+                    name = event.cacTitle, description = event.cacCliDescripcion, evento = event)
+            val baseCalendarEvent = MyCalendarEvent(day, day, dayItem, baseEvent)
+            baseCalendarEvent.setEventInstanceDay(calDay)
+            eventList.add(baseCalendarEvent)
+        }
 
-            }
-        }
     }
     return eventList
 
@@ -74,3 +69,11 @@ fun getDayItem(calendarDay: Calendar, context: Context?): DayItem? {
 }
 fun Calendar.isSameDay(newDate: Calendar): Boolean =
     this.get(Calendar.DAY_OF_MONTH) == newDate.get(Calendar.DAY_OF_MONTH)
+
+
+
+fun Calendar.toStringFormat(): String? {
+    val time = this.time
+    val format = SimpleDateFormat("yyyy/MM/dd")
+    return format.format(time)
+}

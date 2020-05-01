@@ -29,6 +29,7 @@ import mx.ctrlpg.util.calendar.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -37,6 +38,7 @@ class HomeFragment : Fragment(), CalendarController{
     private var oldDate: Calendar? = null
     private lateinit var homeViewModel: HomeViewModel
     private lateinit var eventList: MutableList<CalendarEvent>
+    private lateinit var tempEventList: MutableList<CalendarEvent>
     var dayItem: IDayItem? = null
     var calendarDay: Calendar? = null
     private var contentManager: CalendarContentManager? = null
@@ -45,6 +47,7 @@ class HomeFragment : Fragment(), CalendarController{
     private var loadingTask: LoadingTask? = null
     private lateinit var minDate: Calendar
     private lateinit var maxDate: Calendar
+    val sdf = SimpleDateFormat("yyyy/MM/dd")
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -80,23 +83,37 @@ class HomeFragment : Fragment(), CalendarController{
 
         contentManager!!.locale = Locale("es", "ES")
         contentManager!!.setDateRange(minDate, maxDate)
+        eventList = arrayListOf()
+        val maxLength = Calendar.getInstance().getMaximum(Calendar.DAY_OF_MONTH)
+        for (i in 1..maxLength) {
+            val day = Calendar.getInstance(Locale("es","ES"))
+            day.timeInMillis = System.currentTimeMillis()
+            day.set(Calendar.DAY_OF_MONTH, i)
 
-        getCalendario()
+            eventList.add(MyCalendarEvent(day, day,
+                DayItem.buildDayItemFromCal(day), null).setEventInstanceDay(day))
+        }
+
+        val fechaIni = Calendar.getInstance()
+        fechaIni.set(Calendar.DAY_OF_MONTH,1)
+        val fechaFin = Calendar.getInstance()
+        fechaFin.set(Calendar.DAY_OF_MONTH, fechaIni.getActualMaximum(Calendar.DAY_OF_MONTH))
+        fechaIni.toStringFormat()?.let { fechaFin.toStringFormat()?.let { it1 ->
+            getCalendario(it,
+                it1,
+                true
+            )
+        } }
     }
 
-
-
-    private fun mockList() {
-
-    }
-
-
-    private fun getCalendario(){
+    private fun getCalendario(fechIni:String, fechFin:String, addFromStart: Boolean){
 
         val call = ApiUtils.apiService.getCalendario(
             PreferenceHelper.read(USUARIOSESION,""),
             PreferenceHelper.read(USUARIOSESION,""),
-            PreferenceHelper.read(AUTHORIZATION,"")
+            PreferenceHelper.read(AUTHORIZATION,""),
+            fechIni,
+            fechFin
         )
 
         call.enqueue(object : Callback<CalendarioRespuesta> {
@@ -108,6 +125,12 @@ class HomeFragment : Fragment(), CalendarController{
                 if (calendarioRespuesta!=null) {
                     if(!calendarioRespuesta.error) {
                         setListToView(calendarioRespuesta)
+                        if (addFromStart) {
+                            contentManager?.loadItemsFromStart(tempEventList)
+                        } else {
+                            contentManager?.loadFromEndCalendar(tempEventList)
+                        }
+                        agenda_calendar_view.hideProgress()
                     }else{
                         alertUtil.showFailed(calendarioRespuesta.toString())
                     }
@@ -121,18 +144,9 @@ class HomeFragment : Fragment(), CalendarController{
         })
     }
     fun setListToView(calendarResponse: CalendarioRespuesta){
-        eventList = arrayListOf()
-        val maxLength = Calendar.getInstance().getMaximum(Calendar.DAY_OF_MONTH)
-        for (i in 1..maxLength) {
-            val day = Calendar.getInstance(Locale("es","ES"))
-            day.timeInMillis = System.currentTimeMillis()
-            day.set(Calendar.DAY_OF_MONTH, i)
 
-            eventList.add(MyCalendarEvent(day, day,
-                DayItem.buildDayItemFromCal(day), null).setEventInstanceDay(day))
-        }
-        eventList = listToEvent(calendarResponse.list,this@HomeFragment.context,eventList)
-        contentManager!!.loadItemsFromStart(eventList)
+        tempEventList = listToEvent(calendarResponse.list,this@HomeFragment.context,eventList)
+
     }
 
     override fun getEmptyEventLayout(): Int {
@@ -181,17 +195,14 @@ class HomeFragment : Fragment(), CalendarController{
     inner class LoadingTask(private val addFromStart: Boolean) : AsyncTask<Unit, Unit, Unit>() {
 
         private val startMonthCal: Calendar = Calendar.getInstance()
-        private val endMonthCal: Calendar = Calendar.getInstance()
+        private var endMonthCal: Calendar = Calendar.getInstance()
 
         override fun onPreExecute() {
             super.onPreExecute()
             agenda_calendar_view.showProgress()
-            eventList.clear()
         }
 
         override fun doInBackground(vararg params: Unit?) {
-            Thread.sleep(2000) // simulating requesting json via rest api
-
             if (addFromStart) {
                 if (startMonth == 0) {
                     startMonth = 11
@@ -200,26 +211,21 @@ class HomeFragment : Fragment(), CalendarController{
                 }
 
                 startMonthCal.set(Calendar.MONTH, startMonth)
+
                 if (startMonth == 11) {
                     var year = startMonthCal.get(Calendar.YEAR)
                     startMonthCal.set(Calendar.YEAR, ++year)
                 }
+                startMonthCal.set(Calendar.DAY_OF_MONTH, 1)
+                endMonthCal = startMonthCal.clone() as Calendar
+                endMonthCal.set(Calendar.DAY_OF_MONTH,startMonthCal.getActualMaximum(Calendar.DAY_OF_MONTH))
 
-
-                for (i in 1..startMonthCal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-                    val day = Calendar.getInstance(Locale("es","ES"))
-                    day.timeInMillis = System.currentTimeMillis()
-                    day.set(Calendar.MONTH, startMonth)
-                    day.set(Calendar.DAY_OF_MONTH, i)
-                    if (endMonth == 11) {
-                        day.set(Calendar.YEAR, day.get(Calendar.YEAR) - 1)
-                    }
-
-                    eventList.add(MyCalendarEvent(day, day,
-                        DayItem.buildDayItemFromCal(day),
-                        SampleEvent(name = "Awesome $i", description = "Event $i"))
-                        .setEventInstanceDay(day))
-                }
+                startMonthCal.toStringFormat()?.let { endMonthCal.toStringFormat()?.let { it1 ->
+                    getCalendario(it,
+                        it1,
+                        true
+                    )
+                } }
             } else {
                 if (endMonth >= 11) {
                     endMonth = 0
@@ -232,43 +238,17 @@ class HomeFragment : Fragment(), CalendarController{
                     var year = endMonthCal.get(Calendar.YEAR)
                     endMonthCal.set(Calendar.YEAR, ++year)
                 }
+                endMonthCal = startMonthCal.clone() as Calendar
+                startMonthCal.set(Calendar.DAY_OF_MONTH, 1)
+                endMonthCal.set(Calendar.DAY_OF_MONTH,startMonthCal.getActualMaximum(Calendar.DAY_OF_MONTH))
 
-                for (i in 1..endMonthCal.getActualMaximum(Calendar.DAY_OF_MONTH)) {
-                    val day = Calendar.getInstance(Locale.ENGLISH)
-                    day.timeInMillis = System.currentTimeMillis()
-                    day.set(Calendar.MONTH, endMonth)
-                    day.set(Calendar.DAY_OF_MONTH, i)
-                    if (endMonth == 0) {
-                        day.set(Calendar.YEAR, day.get(Calendar.YEAR) + 1)
-                    }
-
-                    if (i % 4 == 0) {
-                        val day1 = Calendar.getInstance()
-                        day1.timeInMillis = System.currentTimeMillis()
-                        day1.set(Calendar.MONTH, endMonth)
-                        day1.set(Calendar.DAY_OF_MONTH, i)
-                        eventList.add(MyCalendarEvent(day, day,
-                            DayItem.buildDayItemFromCal(day),
-                            SampleEvent(name = "Awesome $i", description = "Event $i")
-                        )
-                            .setEventInstanceDay(day))
-                    }
-
-                    eventList.add(MyCalendarEvent(day, day,
-                        DayItem.buildDayItemFromCal(day),
-                        SampleEvent(name = "Awesome $i", description = "Event $i"))
-                        .setEventInstanceDay(day))
-                }
+                startMonthCal.toStringFormat()?.let { endMonthCal.toStringFormat()?.let { it1 ->
+                    getCalendario(it,
+                        it1,
+                        false
+                    )
+                } }
             }
-        }
-
-        override fun onPostExecute(user: Unit) {
-            if (addFromStart) {
-                contentManager?.loadItemsFromStart(eventList)
-            } else {
-                contentManager?.loadFromEndCalendar(eventList)
-            }
-            agenda_calendar_view.hideProgress()
         }
     }
 

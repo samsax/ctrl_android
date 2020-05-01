@@ -4,10 +4,7 @@ import android.content.Context
 import android.view.View
 import android.widget.TextView
 import androidx.core.os.bundleOf
-import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment.findNavController
-import com.ognev.kotlin.agendacalendarview.CalendarManager
 import com.ognev.kotlin.agendacalendarview.models.CalendarEvent
 import com.ognev.kotlin.agendacalendarview.render.DefaultEventAdapter
 import com.ognev.kotlin.agendacalendarview.utils.DateHelper
@@ -41,10 +38,9 @@ class EventAgendaAdapter (var context: Context) : DefaultEventAdapter() {
         }
 
         override fun getEventItemView(view: View, event: CalendarEvent, position: Int) {
-            val myEvent = event as MyCalendarEvent
-            val myObject: SampleEvent? = myEvent.event as SampleEvent?
+            val myObject: SampleEvent? = event.event as SampleEvent?
 
-            if(myEvent.hasEvent()) {
+            if(event.hasEvent()) {
                 (view.findViewById(R.id.name)
                         as TextView).text = myObject!!.name
 
