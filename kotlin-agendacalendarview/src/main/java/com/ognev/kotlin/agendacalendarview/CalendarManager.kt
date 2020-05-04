@@ -18,7 +18,7 @@ class CalendarManager
 
 (val context: Context) {
 
-    var locale: Locale? = null
+    var locale: Locale? = Locale("es","ES")
         set(locale) {
             field = locale
             today = Calendar.getInstance(this.locale)

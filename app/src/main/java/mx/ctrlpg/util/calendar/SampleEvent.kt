@@ -1,3 +1,5 @@
 package mx.ctrlpg.util.calendar
 
-data class SampleEvent(val id: Long = 0, val name: String, val description: String)
+import mx.ctrlpg.data.model.Evento
+
+data class SampleEvent(val id: Long = 0, val name: String, val description: String, val evento: Evento? = null)

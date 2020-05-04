@@ -8,22 +8,21 @@
     <fragment
         android:id="@+id/nav_home"
         android:name="mx.ctrlpg.ui.home.HomeFragment"
-        android:label="@string/menu_home"
+        android:label="@string/menu_calendar"
         tools:layout="@layout/fragment_home" >
         <action
-            android:id="@+id/action_nav_home_to_dayFragment"
-            app:destination="@id/day_fragment">
+            android:id="@+id/action_nav_home_to_event_fragment"
+            app:destination="@id/event_fragment">
             <argument
-                android:name="cacId"
-                app:argType="integer"
-                android:defaultValue="0" />
+                android:name="evento"
+                app:argType="mx.ctrlpg.data.model.Evento" />
         </action>
     </fragment>
 
     <fragment
         android:id="@+id/nav_gallery"
         android:name="mx.ctrlpg.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
+        android:label="@string/menu_bitacora"
         tools:layout="@layout/fragment_gallery" />
 
     <fragment
@@ -50,8 +49,20 @@
         android:label="@string/menu_send"
         tools:layout="@layout/fragment_send" />
     <fragment
-        android:id="@+id/day_fragment"
+        android:id="@+id/event_fragment"
         android:name="mx.ctrlpg.ui.event.EventFragment"
-        android:label="DayFragment" />
+        android:label="@string/event">
+        <action
+            android:id="@+id/action_event_fragment_to_cordon_fragment"
+            app:destination="@id/cordon_fragment">
+            <argument
+                android:name="cordon"
+                app:argType="mx.ctrlpg.data.model.SucursalCordon" />
+        </action>
+    </fragment>
 
+    <fragment
+        android:id="@+id/cordon_fragment"
+        android:name="mx.ctrlpg.ui.event.CordonFragment"
+        android:label="@string/cordon"/>
 </navigation>

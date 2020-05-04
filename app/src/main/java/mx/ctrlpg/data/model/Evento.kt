@@ -1,6 +1,7 @@
 package mx.ctrlpg.data.model
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 /*
 Copyright (c) 2020 Kotlin Data Classes Generated from JSON powered by http://www.json2kotlin.com
@@ -18,7 +19,7 @@ data class Evento (
 
     @SerializedName("cacId") val cacId : Int,
     @SerializedName("cacCliId") val cacCliId : Int,
-    @SerializedName("cacSucId") val cacSucId : Int,
+    @SerializedName("cacSucId") val cacSucId : Long,
     @SerializedName("cacTacId") val cacTacId : Int,
     @SerializedName("cacFecha") val cacFecha : String,
     @SerializedName("cacHoraIncio") val cacHoraIncio : String,
@@ -40,4 +41,4 @@ data class Evento (
     @SerializedName("cacCliDireccion") val cacCliDireccion : String,
     @SerializedName("cacTacDescripcion") val cacTacDescripcion : String,
     @SerializedName("cacValidaTecnico") val cacValidaTecnico : Int
-)
+) : Serializable
